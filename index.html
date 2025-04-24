@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Tanda Tangan Digital</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 50px; }
+        canvas { border: 1px solid #000; margin-top: 20px; }
+        button { margin: 10px; padding: 10px 20px; }
+    </style>
+</head>
+<body>
+    <h1>FORMULIR IJIN PEMASARAN YANG DI BUAT OLEH</h1>
+    <h1>ENDRA (AGEN PROPERTI RAY WHITE SEMARANG KOTA)</h1>
+    <!-- Gambar Kartun Nama -->
+    <img src="zazazaz.PNG" alt="Kartun Nama" style="max-width:600px; height:auto; margin-top:10px;"/>
+  
+    <!-- Form image -->
+    <img src="raywhite%20(p1).jpg" id="form-image" alt="Formulir" style="max-width:100%; height:auto; margin-top:20px;"/>
+    <p>Gambar tanda tangan Anda di bawah ini:</p>
+    <canvas id="signature-pad" width="500" height="200"></canvas>
+    <div>
+        <button id="clear">Hapus</button>
+        <button id="save">Simpan tanda tangan</button>
+        
+    </div>
+    <script>
+        const canvas = document.getElementById('signature-pad');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+        canvas.addEventListener('mousedown', e => { drawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); });
+        canvas.addEventListener('mouseup', () => drawing = false);
+        canvas.addEventListener('mouseout', () => drawing = false);
+        canvas.addEventListener('mousemove', e => { if(!drawing) return; ctx.lineWidth=2; ctx.lineCap='round'; ctx.strokeStyle='#000'; ctx.lineTo(e.offsetX,e.offsetY); ctx.stroke(); });
+        document.getElementById('clear').addEventListener('click', ()=>{ ctx.clearRect(0,0,canvas.width,canvas.height); ctx.beginPath(); });
+            // Result canvas
+        const resultCanvas = document.createElement('canvas');
+        const resultCtx = resultCanvas.getContext('2d');
+        resultCanvas.style.display = 'none';
+        resultCanvas.style.marginTop = '20px';
+        document.body.appendChild(resultCanvas);
+        document.getElementById('save').addEventListener('click', () => {
+            const dataURL = canvas.toDataURL('image/png');
+            const sigImg = new Image(); sigImg.src = dataURL;
+            sigImg.onload = () => {
+                const formImg = document.getElementById('form-image');
+                resultCanvas.width = formImg.naturalWidth;
+                resultCanvas.height = formImg.naturalHeight;
+                resultCtx.drawImage(formImg, 0, 0);
+                const x = 115, y = formImg.naturalHeight - 240, w = 350, h = 120;
+                resultCtx.drawImage(sigImg, x, y, w, h);
+                resultCtx.font = "20px Arial";
+                resultCtx.fillStyle = "#000";
+                let name = prompt("Masukkan Nama Terang:");
+                if(name) resultCtx.fillText(name.toUpperCase(), x+45, y+h+5);
+                resultCanvas.style.display = 'block';
+                // otomatis download
+                const link = document.createElement('a');
+                link.href = resultCanvas.toDataURL('image/png');
+                link.download = 'form_hasil.png';
+                document.body.appendChild(link);
+                link.click();
+                setTimeout(() => document.body.removeChild(link), 100);
+            };
+        });
+        
+    </script>

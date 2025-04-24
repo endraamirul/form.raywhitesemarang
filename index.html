@@ -76,10 +76,15 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                // Kirim via WhatsApp
-                const imageData = resultCanvas.toDataURL('image/png');
-                const whatsappUrl = `https://wa.me/6285117626063?text=${encodeURIComponent(imageData)}`;
-                window.open(whatsappUrl, '_blank');
+                // Kirim ke Google Drive via Apps Script
+                fetch('https://script.google.com/macros/s/AKfycbyI4IJ7-ThQF2wFjKxcaUPyuaF3ZUzF7YmMX8qKCsZfikhckbX-cI8fnE-tHBvJIXht/exec', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ imageData: resultCanvas.toDataURL('image/png') })
+                })
+                .then(res => res.json())
+                .then(json => alert('File tersimpan di Drive: ' + json.url))
+                .catch(err => alert('Gagal upload ke Drive'));
             };
         });
     </script>

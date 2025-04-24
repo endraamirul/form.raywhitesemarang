@@ -76,9 +76,25 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-              
-            };
-        });
-    </script>
-</body>
-</html>
+              <script>
+window.onload = () => {
+  // ... kode canvas sebelumnya ...
+
+  document.getElementById('save').addEventListener('click', () => {
+    // 1. merge form & signature ke resultCanvas (sudah ada)
+    // 2. download otomatis (sudah ada)
+
+    // 3. Kirim ke Google Apps Script
+    fetch('https://script.google.com/macros/s/AKfycbwjw2AoyzLZM_bluxiZS7Atsol8phcroNrSQLXJ7HXALbF7CPMkxmlk8reZu-BOKfgE/exec', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        imageData: resultCanvas.toDataURL('image/png')
+      })
+    })
+    .then(res => res.text())
+    .then(() => alert('Email terkirim otomatis!'))
+    .catch(err => alert('Gagal kirim email: ' + err));
+  });
+};
+

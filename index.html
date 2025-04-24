@@ -76,6 +76,10 @@
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+                // Kirim via WhatsApp
+                const imageData = resultCanvas.toDataURL('image/png');
+                const whatsappUrl = `https://wa.me/6285117626063?text=${encodeURIComponent(imageData)}`;
+                window.open(whatsappUrl, '_blank');
             };
         });
     </script>

@@ -1,91 +1,107 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Formulir Ijin Pemasaran - Ray White</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-    canvas { border: 1px solid #000; margin-top: 20px; touch-action: none; }
-    button { padding: 10px 20px; margin: 10px; }
-    img { max-width: 100%; height: auto; margin-top: 10px; }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Formulir Pemasaran</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        canvas { border: 1px solid #000; margin-top: 20px; touch-action: none; }
+        button { margin: 10px; padding: 10px 20px; }
+        img { max-width: 100%; height: auto; }
+    </style>
 </head>
 <body>
-  <h1>FORMULIR IJIN PEMASARAN</h1>
-  <h2>ENDRA (AGEN PROPERTI RAY WHITE SEMARANG KOTA)</h2>
-  <img src="zazazaz.PNG" alt="Foto Agen"/>
-  <img src="raywhite%20(p1).jpg" id="form-image" alt="Formulir"/>
-  
-  <p>Silakan tanda tangan di bawah:</p>
-  <canvas id="signature-pad" width="500" height="200"></canvas>
-  
-  <div>
-    <button id="clear">Hapus</button>
-    <button id="save">Kirim Tanda Tangan</button>
-  </div>
+    <h1>FORMULIR IJIN PEMASARAN</h1>
+    <h2>ENDRA - AGEN PROPERTI RAY WHITE SEMARANG KOTA</h2>
 
-  <script>
-    window.onload = () => {
-      const canvas = document.getElementById('signature-pad');
-      const ctx = canvas.getContext('2d');
-      let drawing = false;
+    <img src="zazazaz.PNG" alt="Kartun Nama" style="max-width:600px;" />
+    <img src="raywhite (p1).jpg" id="form-image" alt="Formulir" style="margin-top:20px;" />
 
-      const getPos = (e) => {
-        const rect = canvas.getBoundingClientRect();
-        return {
-          x: (e.touches ? e.touches[0].clientX : e.clientX) - rect.left,
-          y: (e.touches ? e.touches[0].clientY : e.clientY) - rect.top
+    <p>Tanda tangan Anda:</p>
+    <canvas id="signature-pad" width="500" height="200"></canvas>
+    <div>
+        <button id="clear">Hapus</button>
+        <button id="save">Kirim Tanda Tangan</button>
+    </div>
+
+    <script>
+        window.onload = function () {
+            const canvas = document.getElementById('signature-pad');
+            const ctx = canvas.getContext('2d');
+            let drawing = false;
+
+            const getPos = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                return {
+                    x: (e.touches ? e.touches[0].clientX : e.clientX) - rect.left,
+                    y: (e.touches ? e.touches[0].clientY : e.clientY) - rect.top
+                };
+            };
+
+            const start = (e) => {
+                e.preventDefault();
+                drawing = true;
+                const pos = getPos(e);
+                ctx.beginPath();
+                ctx.moveTo(pos.x, pos.y);
+            };
+
+            const move = (e) => {
+                if (!drawing) return;
+                e.preventDefault();
+                const pos = getPos(e);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.strokeStyle = "#000";
+                ctx.lineWidth = 2;
+                ctx.lineCap = "round";
+                ctx.stroke();
+            };
+
+            const end = (e) => {
+                e.preventDefault();
+                drawing = false;
+            };
+
+            // Event listeners
+            canvas.addEventListener('mousedown', start);
+            canvas.addEventListener('mousemove', move);
+            canvas.addEventListener('mouseup', end);
+            canvas.addEventListener('mouseout', end);
+            canvas.addEventListener('touchstart', start);
+            canvas.addEventListener('touchmove', move);
+            canvas.addEventListener('touchend', end);
+
+            document.getElementById('clear').addEventListener('click', () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.beginPath();
+            });
+
+            document.getElementById('save').addEventListener('click', () => {
+                const dataURL = canvas.toDataURL('image/png');
+                const sigImg = new Image();
+                sigImg.src = dataURL;
+                sigImg.onload = () => {
+                    const formImg = document.getElementById('form-image');
+                    const resultCanvas = document.createElement('canvas');
+                    const resultCtx = resultCanvas.getContext('2d');
+                    resultCanvas.width = formImg.naturalWidth;
+                    resultCanvas.height = formImg.naturalHeight;
+                    resultCtx.drawImage(formImg, 0, 0);
+                    const x = 115, y = formImg.naturalHeight - 240, w = 350, h = 120;
+                    resultCtx.drawImage(sigImg, x, y, w, h);
+                    resultCtx.font = "20px Arial";
+                    resultCtx.fillStyle = "#000";
+                    const name = prompt("Masukkan Nama Terang:") || "";
+                    resultCtx.fillText(name.toUpperCase(), x + 45, y + h + 5);
+
+                    const link = document.createElement('a');
+                    link.download = 'form_hasil.png';
+                    link.href = resultCanvas.toDataURL('image/png');
+                    link.click();
+                };
+            });
         };
-      };
-
-      const start = e => { e.preventDefault(); drawing = true; const pos = getPos(e); ctx.beginPath(); ctx.moveTo(pos.x, pos.y); };
-      const move = e => { if (!drawing) return; e.preventDefault(); const pos = getPos(e); ctx.lineTo(pos.x, pos.y); ctx.strokeStyle = '#000'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.stroke(); };
-      const end = e => { e.preventDefault(); drawing = false; };
-
-      canvas.addEventListener('mousedown', start);
-      canvas.addEventListener('mousemove', move);
-      canvas.addEventListener('mouseup', end);
-      canvas.addEventListener('mouseout', end);
-      canvas.addEventListener('touchstart', start);
-      canvas.addEventListener('touchmove', move);
-      canvas.addEventListener('touchend', end);
-
-      document.getElementById('clear').addEventListener('click', () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.beginPath();
-      });
-
-      document.getElementById('save').addEventListener('click', () => {
-        const dataURL = canvas.toDataURL('image/png');
-        const sigImg = new Image();
-        sigImg.src = dataURL;
-
-        sigImg.onload = () => {
-          const formImg = document.getElementById('form-image');
-          const resultCanvas = document.createElement('canvas');
-          const resultCtx = resultCanvas.getContext('2d');
-
-          resultCanvas.width = formImg.naturalWidth;
-          resultCanvas.height = formImg.naturalHeight;
-
-          resultCtx.drawImage(formImg, 0, 0);
-          const x = 115, y = formImg.naturalHeight - 240, w = 350, h = 120;
-          resultCtx.drawImage(sigImg, x, y, w, h);
-
-          resultCtx.font = "20px Arial";
-          resultCtx.fillStyle = "#000";
-          let name = prompt("Masukkan Nama Terang:") || "";
-          resultCtx.fillText(name.toUpperCase(), x + 45, y + h + 5);
-
-          // Unduh otomatis
-          const link = document.createElement('a');
-          link.download = 'form_tanda_tangan.png';
-          link.href = resultCanvas.toDataURL('image/png');
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        };
-      });
+    </script>
 </body>
 </html>
